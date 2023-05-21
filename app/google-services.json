@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "626433119360",
+    "project_id": "partyapp-bcb2a",
+    "storage_bucket": "partyapp-bcb2a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:626433119360:android:8bd8873f9b231e5fff4265",
+        "android_client_info": {
+          "package_name": "com.martin.partyapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "626433119360-3lkm1lmo2gddh4oqk4u29v9cft5pkjj0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXSjYtDmnQitFT-mzPWW9cLPZMAuCPeH4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "626433119360-3lkm1lmo2gddh4oqk4u29v9cft5pkjj0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
