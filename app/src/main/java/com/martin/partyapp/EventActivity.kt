@@ -1,9 +1,11 @@
 package com.martin.partyapp
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -25,13 +27,13 @@ class EventActivity : AppCompatActivity() {
     private lateinit var event: Event
     private lateinit var eventId: String
     private lateinit var chatRecyclerView: RecyclerView
-    private lateinit var messageList: ArrayList<Message>
     private lateinit var messageAdapter: MessageAdapter
     private lateinit var buttonSendMessage: ImageButton
     private lateinit var editMessage: EditText
     private lateinit var textEventName: TextView
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
+    private var messageList: ArrayList<Message> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,13 +47,6 @@ class EventActivity : AppCompatActivity() {
             val intent = Intent(this@EventActivity, EventListActivity::class.java)
             startActivity(intent)
         }
-
-        messageList = ArrayList()
-        messageAdapter = MessageAdapter(this, messageList)
-
-        chatRecyclerView = findViewById(R.id.chat_recycler_view)
-        chatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true)
-        chatRecyclerView.adapter = messageAdapter
 
         textEventName = findViewById(R.id.text_event_name)
         textEventName.setOnClickListener {
@@ -88,6 +83,35 @@ class EventActivity : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {}
         })
 
+        buttonSendMessage.setOnClickListener {
+            val messageContent = editMessage.text.toString()
+            if (messageContent.isNotEmpty()) {
+                val message = Message()
+                message.content = messageContent
+                message.date = System.currentTimeMillis()
+                message.senderUser = user
+                event.messages.add(message)
+                val eventRef = database.getReference("Event/$eventId")
+                eventRef.setValue(event)
+                editMessage.setText("")
+
+                editMessage.clearFocus()
+                val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(editMessage.windowToken, 0)
+            } else {
+                Toast.makeText(this@EventActivity, "Veuillez entrer un message", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun run() {
+        textEventName.text = event.eventName
+
+        messageAdapter = MessageAdapter(this, messageList, event)
+        chatRecyclerView = findViewById(R.id.chat_recycler_view)
+        chatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true)
+        chatRecyclerView.adapter = messageAdapter
+
         val messageRef = database.getReference("Event/$eventId/messages")
         messageRef.addValueEventListener(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -101,25 +125,5 @@ class EventActivity : AppCompatActivity() {
             }
             override fun onCancelled(error: DatabaseError) {}
         })
-
-        buttonSendMessage.setOnClickListener {
-            val messageContent = editMessage.text.toString()
-            if (messageContent.isNotEmpty()) {
-                val message = Message()
-                message.content = messageContent
-                message.date = System.currentTimeMillis()
-                message.senderUser = user
-                event.messages.add(message)
-                val eventRef = database.getReference("Event/$eventId")
-                eventRef.setValue(event)
-                editMessage.setText("")
-            } else {
-                Toast.makeText(this@EventActivity, "Veuillez entrer un message", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun run() {
-        textEventName.text = event.eventName
     }
 }

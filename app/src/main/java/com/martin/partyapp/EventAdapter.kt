@@ -60,7 +60,7 @@ class EventAdapter(private val context: Context, private val eventList: List<Eve
             textEventDate.text = formattedDate
 
             //Event Last Notification
-            Log.e("Event", "$event, ${event.eventId}, ${event.messages}")
+
             if (event.messages.size > 0){
                 val lastMessage = event.messages.last()
                 val lastMessageContent = lastMessage.content!!
@@ -70,7 +70,6 @@ class EventAdapter(private val context: Context, private val eventList: List<Eve
                 } else {
                     lastMessageContent
                 }
-                Log.e("Message Content", textLastMessage)
                 textEventLastNotification.text = textLastMessage
                 textEventLastNotification.visibility = View.VISIBLE
             } else {

@@ -1,6 +1,7 @@
 package com.martin.partyapp
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -8,8 +9,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
@@ -38,6 +41,11 @@ class UserAdapter(private val context: Context, private val userList: List<User>
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val user = userList[position]
         holder.bind(user)
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, ProfileActivity::class.java)
+            intent.putExtra("userId", user.userId)
+            context.startActivity(intent)
+        }
 
         authUserRef.addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {

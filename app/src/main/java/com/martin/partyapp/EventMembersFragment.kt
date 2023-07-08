@@ -35,6 +35,7 @@ class EventMembersFragment : Fragment() {
     private lateinit var eventMembersNumberText: TextView
 
     private lateinit var descriptionButton: LinearLayout
+    private lateinit var itemsButton: LinearLayout
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_event_members, container, false)
@@ -60,6 +61,13 @@ class EventMembersFragment : Fragment() {
             val fragmentManager = requireActivity().supportFragmentManager
             val transaction = fragmentManager.beginTransaction()
             transaction.add(R.id.fragment_container, EventDescriptionFragment())
+            transaction.commit()
+        }
+        itemsButton = view.findViewById(R.id.button_items)
+        itemsButton.setOnClickListener {
+            val fragmentManager = requireActivity().supportFragmentManager
+            val transaction = fragmentManager.beginTransaction()
+            transaction.add(R.id.fragment_container, EventItemsFragment())
             transaction.commit()
         }
 

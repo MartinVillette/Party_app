@@ -27,6 +27,7 @@ class EventDescriptionFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
 
     private lateinit var membersButton: LinearLayout
+    private lateinit var itemsButton: LinearLayout
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_event_description, container, false)
@@ -43,6 +44,13 @@ class EventDescriptionFragment : Fragment() {
             val fragmentManager = requireActivity().supportFragmentManager
             val transaction = fragmentManager.beginTransaction()
             transaction.add(R.id.fragment_container, EventMembersFragment())
+            transaction.commit()
+        }
+        itemsButton = view.findViewById(R.id.button_items)
+        itemsButton.setOnClickListener {
+            val fragmentManager = requireActivity().supportFragmentManager
+            val transaction = fragmentManager.beginTransaction()
+            transaction.add(R.id.fragment_container, EventItemsFragment())
             transaction.commit()
         }
 

@@ -20,7 +20,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class MessageAdapter (val context: Context, private val messageList: ArrayList<Message>):
+class MessageAdapter (val context: Context, private val messageList: ArrayList<Message>, private val event: Event):
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val ITEM_RECEIVED = 1
@@ -41,11 +41,11 @@ class MessageAdapter (val context: Context, private val messageList: ArrayList<M
         if (holder.itemViewType == ITEM_SENT) {
             //sent message
             val viewHolder = holder as SentViewHolder
-            viewHolder.bind(message)
+            viewHolder.bind(message, event)
         } else {
             //received message
             val viewHolder = holder as ReceivedViewHolder
-            viewHolder.bind(message)
+            viewHolder.bind(message, event)
         }
     }
 
@@ -64,17 +64,16 @@ class MessageAdapter (val context: Context, private val messageList: ArrayList<M
 
     class SentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         private val textMessageSent: TextView = itemView.findViewById(R.id.text_message_sent)
-        private val profilePictureImage: ImageView = itemView.findViewById(R.id.image_profile_picture)
+        //private val profilePictureImage: ImageView = itemView.findViewById(R.id.image_profile_picture)
 
-        fun bind(message: Message){
+        fun bind(message: Message, event: Event){
             textMessageSent.text = message.content
-
+            textMessageSent.setTextColor(event.usersColor[message.senderUser!!.userId]!!)
+            /*
             Glide.with(itemView)
                 .load(message.senderUser!!.profilePictureUrl)
                 .circleCrop()
-                .into(profilePictureImage)
-
-            Log.e("User", "${message.senderUser!!.profilePictureUrl}")
+                .into(profilePictureImage)*/
         }
     }
 
@@ -82,13 +81,20 @@ class MessageAdapter (val context: Context, private val messageList: ArrayList<M
         private val textMessageReceived: TextView = itemView.findViewById(R.id.text_message_received)
         private val profilePictureImage: ImageView = itemView.findViewById(R.id.image_profile_picture)
 
-        fun bind(message: Message){
+        fun bind(message: Message, event: Event){
             textMessageReceived.text = message.content
+            textMessageReceived.setTextColor(event.usersColor[message.senderUser!!.userId]!!)
 
             Glide.with(itemView)
                 .load(message.senderUser!!.profilePictureUrl)
                 .circleCrop()
                 .into(profilePictureImage)
+
+            profilePictureImage.setOnClickListener {
+                val intent = Intent(itemView.context, ProfileActivity::class.java)
+                intent.putExtra("userId", message.senderUser!!.userId)
+                itemView.context.startActivity(intent)
+            }
         }
     }
 }

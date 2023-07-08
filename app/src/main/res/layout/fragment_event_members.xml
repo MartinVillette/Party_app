@@ -64,6 +64,7 @@
                 android:text="Members"/>
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/button_items"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -84,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:textColor="@color/white"
-                android:text="..."/>
+                android:text="Items"/>
         </LinearLayout>
 
         <LinearLayout
