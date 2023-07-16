@@ -188,8 +188,7 @@ class NewEventActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // If the event if added, we add the event to all users' events
-                    for (user in event.users){
-                        val userId = user.userId!!
+                    for (userId in event.usersIds){
                         val userRef = database.getReference("User")
                         userRef.child(userId).addListenerForSingleValueEvent(object: ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {

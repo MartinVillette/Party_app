@@ -66,11 +66,11 @@ class EventAdapter(private val context: Context, private val eventList: List<Eve
                 val lastMessageContent = lastMessage.content!!
                 val notificationLength = 20
                 val textLastMessage = if (lastMessageContent.length > notificationLength - 3){
-                    lastMessageContent.substring(0,notificationLength)
+                    lastMessageContent.substring(0,notificationLength) + " ..."
                 } else {
                     lastMessageContent
                 }
-                textEventLastNotification.text = textLastMessage
+                textEventLastNotification.text = lastMessage.senderUser!!.username + " : " + textLastMessage
                 textEventLastNotification.visibility = View.VISIBLE
             } else {
                 textEventLastNotification.visibility = View.GONE

@@ -9,7 +9,6 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -29,6 +28,8 @@ class EventListActivity : AppCompatActivity() {
     private lateinit var searchBar: EditText
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
+
+    private var allUserEvents: ArrayList<Event> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,27 +71,51 @@ class EventListActivity : AppCompatActivity() {
             val intent = Intent(this@EventListActivity, NewEventActivity::class.java)
             startActivity(intent)
         }
-        updateEventList()
+        initiateEventList()
     }
 
-    private fun updateEventList(research: String = ""){
+    private fun initiateEventList(){
         val userId = auth.currentUser?.uid
-        val eventsRef = database.getReference("User/$userId/events")
-        eventsRef.addValueEventListener(object: ValueEventListener{
+        val userRef = database.getReference("User/$userId")
+        userRef.addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                eventList.clear()
-                for (eventSnapshot in snapshot.children){
-                    val event = eventSnapshot.getValue(Event::class.java)
-                    event?.let {
-                        val eventName = it.eventName!!.lowercase()
-                        if (eventName.startsWith(research.lowercase())){
-                            eventList.add(it)
-                        }
-                    }
+                val eventIds: ArrayList<String> = ArrayList()
+
+                val user = snapshot.getValue(User::class.java)
+                user?.let{
+                    eventIds.addAll(it.eventIds)
                 }
-                adapter.notifyDataSetChanged()
+
+                for (eventId in eventIds){
+                    val eventRef = database.getReference("Event/$eventId")
+                    eventRef.addValueEventListener(object: ValueEventListener{
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()){
+                                val event = snapshot.getValue(Event::class.java)
+                                event?.let{
+                                    allUserEvents.add(it)
+                                }
+                            }
+
+                            if (allUserEvents.size == eventIds.size){
+                                updateEventList()
+                            }
+                        }
+                        override fun onCancelled(error: DatabaseError) {}
+                    })
+                }
             }
             override fun onCancelled(error: DatabaseError) {}
         })
+    }
+    private fun updateEventList(research: String = ""){
+        eventList.clear()
+        for (event in allUserEvents){
+            val eventName = event.eventName!!.lowercase()
+            if (eventName.startsWith(research.lowercase())){
+                eventList.add(event)
+            }
+        }
+        adapter.notifyDataSetChanged()
     }
 }

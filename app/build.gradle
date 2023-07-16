@@ -54,6 +54,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
     implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
     implementation 'com.google.firebase:firebase-storage-ktx:20.1.0'
+    implementation 'com.google.android.libraries.places:places:2.5.0'
     //implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
     //implementation 'androidx.activity:activity-compose:1.5.1'
     //implementation platform('androidx.compose:compose-bom:2022.10.00')
@@ -78,4 +79,7 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     //debugImplementation 'androidx.compose.ui:ui-tooling'
     //debugImplementation 'androidx.compose.ui:ui-test-manifest'
+
+    implementation 'com.google.android.gms:play-services-maps:17.0.1'
+    implementation 'com.google.maps:google-maps-services:0.17.0'
 }

@@ -10,7 +10,8 @@ class User(
     var followers: MutableList<User> = mutableListOf(),
     var following: MutableList<User> = mutableListOf(),
     var requests: MutableList<User> = mutableListOf(),
-    var events: MutableList<Event> = mutableListOf(),
+    var eventIds: ArrayList<String> = arrayListOf(),
+    //var events: MutableList<Event> = mutableListOf(),
 ) {
 
     fun addFollower(user:User){
@@ -80,20 +81,18 @@ class User(
     }
 
     fun addEvent(event: Event){
-        val eventIds: List<String> = events.map { it.eventId!! }
         if (!eventIds.contains(event.eventId)){
-            events.add(event)
+            eventIds.add(event.eventId!!)
         }
     }
 
     fun removeUserFromEvent(eventId: String){
-        val eventIds: List<String> = events.map { it.eventId!! }
         if (eventIds.contains(eventId)){
             var i = 0
-            while (events[i].eventId != eventId){
+            while (eventIds[i] != eventId){
                 i++
             }
-            events.removeAt(i)
+            eventIds.removeAt(i)
         }
     }
 }

@@ -2,27 +2,21 @@ package com.martin.partyapp
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class UserAdapter(private val context: Context, private val userList: List<User>) :
+class UserAdapter(private val context: Context, private val userList: List<String>) :
     RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
 
@@ -39,23 +33,24 @@ class UserAdapter(private val context: Context, private val userList: List<User>
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        val user = userList[position]
-        holder.bind(user)
-        holder.itemView.setOnClickListener {
-            val intent = Intent(context, ProfileActivity::class.java)
-            intent.putExtra("userId", user.userId)
-            context.startActivity(intent)
-        }
-
-        authUserRef.addListenerForSingleValueEvent(object: ValueEventListener {
+        val userId = userList[position]
+        val userRef = database.getReference("User/$userId")
+        userRef.addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()){
-                    authUser = snapshot.getValue(User::class.java)!!
-                    updateButtonActions(holder, user)
+                    val user = snapshot.getValue(User::class.java)!!
+                    holder.bind(user)
                 }
             }
             override fun onCancelled(error: DatabaseError) {}
         })
+
+        holder.itemView.setOnClickListener {
+            val intent = Intent(context, ProfileActivity::class.java)
+            intent.putExtra("userId", userId)
+            context.startActivity(intent)
+        }
+
     }
 
     override fun getItemCount(): Int {
@@ -104,22 +99,18 @@ class UserAdapter(private val context: Context, private val userList: List<User>
             }
 
             is EventDescriptionActivity -> {
-                Log.e("tagou", "here : ${authUser?.username}")
-                if (authUser != null){
-                    //we have the authenticated User information's
-                    var authUserFollowingIds = authUser!!.following.map { it.userId }
-                    Log.e("tagou", "here : $authUserFollowingIds")
-                    if (authUserFollowingIds.contains(user.userId)){
-                        // the Auth User is following the user
-                        holder.buttonAction.setImageResource(R.drawable.following_icon)
-                        holder.buttonAction.setOnClickListener {
-                            holder.removeFollowingAction(user)
-                        }
-                    } else {
-                        holder.buttonAction.setImageResource(R.drawable.follow_icon)
-                        holder.buttonAction.setOnClickListener {
-                            holder.addFollowingRequestAction(user)
-                        }
+                //we have the authenticated User information's
+                val authUserFollowingIds = authUser.following.map { it.userId }
+                if (authUserFollowingIds.contains(user.userId)){
+                    // the Auth User is following the user
+                    holder.buttonAction.setImageResource(R.drawable.following_icon)
+                    holder.buttonAction.setOnClickListener {
+                        holder.removeFollowingAction(user)
+                    }
+                } else {
+                    holder.buttonAction.setImageResource(R.drawable.follow_icon)
+                    holder.buttonAction.setOnClickListener {
+                        holder.addFollowingRequestAction(user)
                     }
                 }
                 holder.buttonAction2.visibility = View.GONE
@@ -142,34 +133,43 @@ class UserAdapter(private val context: Context, private val userList: List<User>
                 .load(user.profilePictureUrl)
                 .circleCrop()
                 .into(profilePictureImage)
+
+            authUserRef.addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()){
+                        authUser = snapshot.getValue(User::class.java)!!
+                        updateButtonActions(this@UserViewHolder, user)
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
+
         }
 
         fun addFollowingRequestAction(user: User){
-            if (authUser != null){
-                val ref = database.getReference("User/${user.userId}")
-                ref.addListenerForSingleValueEvent(object: ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()){
-                            val user = snapshot.getValue(User::class.java)
-                            user!!.addFollowingRequest(authUser!!)
-                            ref.setValue(user)
-                        }
+            val ref = database.getReference("User/${user.userId}")
+            ref.addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()){
+                        val currentUser = snapshot.getValue(User::class.java)
+                        currentUser!!.addFollowingRequest(authUser)
+                        ref.setValue(user)
                     }
-                    override fun onCancelled(error: DatabaseError) {}
-                })
-            }
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
         }
 
         fun removeFollowerAction(user: User){
-            authUser!!.removeFollower(user)
+            authUser.removeFollower(user)
             authUserRef.setValue(authUser)
 
             val userRef = database.getReference("User/${user.userId}")
             userRef.addListenerForSingleValueEvent(object: ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()){
-                        val user = snapshot.getValue(User::class.java)
-                        user!!.removeFollowing(authUser!!)
+                        val currentUser = snapshot.getValue(User::class.java)
+                        currentUser!!.removeFollowing(authUser)
                         userRef.setValue(user)
                     }
                 }
@@ -178,15 +178,15 @@ class UserAdapter(private val context: Context, private val userList: List<User>
         }
 
         fun removeFollowingAction(user: User){
-            authUser!!.removeFollowing(user)
+            authUser.removeFollowing(user)
             authUserRef.setValue(authUser)
 
             val userRef = database.getReference("User/${user.userId}")
             userRef.addListenerForSingleValueEvent(object: ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()){
-                        val user = snapshot.getValue(User::class.java)
-                        user!!.removeFollower(authUser!!)
+                        val currentUser = snapshot.getValue(User::class.java)
+                        currentUser!!.removeFollower(authUser)
                         userRef.setValue(user)
                     }
                 }
@@ -195,15 +195,15 @@ class UserAdapter(private val context: Context, private val userList: List<User>
         }
 
         fun acceptFollowingRequestAction(user: User){
-            authUser!!.acceptFollowingRequest(user)
+            authUser.acceptFollowingRequest(user)
             authUserRef.setValue(authUser)
 
             val userRef = database.getReference("User/${user.userId}")
             userRef.addListenerForSingleValueEvent(object: ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()){
-                        val user = snapshot.getValue(User::class.java)
-                        user!!.addFollowing(authUser!!)
+                        val currentUser = snapshot.getValue(User::class.java)
+                        currentUser!!.addFollowing(authUser)
                         userRef.setValue(user)
 
                     }
@@ -213,7 +213,7 @@ class UserAdapter(private val context: Context, private val userList: List<User>
         }
 
         fun declineFollowingRequestAction(user: User){
-            authUser!!.declineFollowingRequest(user)
+            authUser.declineFollowingRequest(user)
             authUserRef.setValue(authUser)
         }
     }

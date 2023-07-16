@@ -4,17 +4,23 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class EventItemsFragment: Fragment() {
 
@@ -27,7 +33,10 @@ class EventItemsFragment: Fragment() {
 
     private lateinit var addItemButton: LinearLayout
 
-    private lateinit var itemList: ArrayList<Item>
+    private lateinit var membersButton: LinearLayout
+    private lateinit var descriptionButton: LinearLayout
+
+    private var itemList: ArrayList<Item> = ArrayList()
     private lateinit var adapter: EventItemAdapter
     private lateinit var eventItemRecyclerView: RecyclerView
 
@@ -41,21 +50,48 @@ class EventItemsFragment: Fragment() {
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance()
 
+        membersButton = view.findViewById(R.id.button_members)
+        membersButton.setOnClickListener {
+            val fragmentManager = requireActivity().supportFragmentManager
+            val transaction = fragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment_container, EventMembersFragment())
+            transaction.commit()
+        }
+        descriptionButton = view.findViewById(R.id.button_description)
+        descriptionButton.setOnClickListener {
+            val fragmentManager = requireActivity().supportFragmentManager
+            val transaction = fragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment_container, EventDescriptionFragment())
+            transaction.commit()
+        }
+
         addItemButton = view.findViewById(R.id.button_add_item)
         addItemButton.setOnClickListener {
             showAddItemPopup()
         }
 
-        itemList = ArrayList()
-        adapter = EventItemAdapter(requireContext(), itemList, event)
-        eventItemRecyclerView = view.findViewById(R.id.items_recycler_view)
-        eventItemRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        eventItemRecyclerView.adapter = adapter
+        val currentUserRef = database.getReference("User/${auth.currentUser?.uid!!}")
+        currentUserRef.addValueEventListener(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()){
+                    val currentUser = snapshot.getValue(User::class.java)
+                    itemList = ArrayList()
+                    adapter = EventItemAdapter(requireContext(), itemList, event, currentUser!!) { item ->
+                        showItemPopUp(item)
+                    }
+                    eventItemRecyclerView = view.findViewById(R.id.items_recycler_view)
+                    eventItemRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                    eventItemRecyclerView.adapter = adapter
 
-        for ((_,item) in event.itemList){
-            itemList.add(item)
-        }
-        adapter.notifyDataSetChanged()
+                    for ((_,item) in event.itemList){
+                        itemList.add(item)
+                    }
+                    Log.e("E",itemList.toString())
+                    adapter.notifyDataSetChanged()
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 
     override fun onAttach(context: Context) {
@@ -66,7 +102,22 @@ class EventItemsFragment: Fragment() {
             authUser = context.authUser
         }
     }
+    private fun showItemPopUp(item: Item){
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.event_item_popup_layout, null)
 
+        val itemNameText = popupView.findViewById<TextView>(R.id.text_item_name)
+        itemNameText.text = item.itemName!!
+
+        val itemInfoAdapter = EventItemInfoAdapter(requireContext(), item.itemUserQuantityList)
+
+        val eventItemInfoRecyclerView = popupView.findViewById<RecyclerView>(R.id.item_info_recycler_view)
+        eventItemInfoRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        eventItemInfoRecyclerView.adapter = itemInfoAdapter
+
+        bottomSheetDialog.setContentView(popupView)
+        bottomSheetDialog.show()
+    }
     private fun showAddItemPopup(){
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Add new Item")
@@ -95,8 +146,9 @@ class EventItemsFragment: Fragment() {
                 newItem.itemId = newItemRef.key ?: ""
                 newItemRef.setValue(newItem)
                     .addOnSuccessListener {
+                        event.addItem(newItem)
                         itemList.add(newItem)
-                        adapter.notifyDataSetChanged()
+                        adapter.notifyItemChanged(itemList.size - 1)
                     }
             }
         }

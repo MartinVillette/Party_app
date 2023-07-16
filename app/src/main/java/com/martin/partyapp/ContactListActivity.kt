@@ -33,7 +33,7 @@ class ContactListActivity : AppCompatActivity() {
     private lateinit var followingButton: LinearLayout
     private lateinit var requestButton: LinearLayout
     private lateinit var userNameText: TextView
-    private lateinit var userList: ArrayList<User>
+    private lateinit var userList: ArrayList<String>
     private lateinit var adapter: UserAdapter
     private lateinit var userRecyclerView: RecyclerView
     private lateinit var buttonBackToolbar: ImageButton
@@ -130,7 +130,7 @@ class ContactListActivity : AppCompatActivity() {
                     val currentUser = postSnapshot.getValue(User::class.java)
                     val username = currentUser!!.username!!.lowercase()
                     if (username.startsWith(research.lowercase()) && currentUser.userId != auth.currentUser?.uid){
-                        userList.add(currentUser)
+                        userList.add(currentUser.userId!!)
                     }
                 }
                 adapter.notifyDataSetChanged()

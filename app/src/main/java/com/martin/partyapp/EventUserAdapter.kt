@@ -25,9 +25,7 @@ class EventUserAdapter(private val context: Context, private val event: Event, p
         val user = userList[position]
         holder.bind(user)
 
-        val eventUserIds: List<String> = event.users.map{ it.userId!! }
-
-        holder.checkBox.isChecked = eventUserIds.contains(user.userId)
+        holder.checkBox.isChecked = event.usersIds.contains(user.userId)
         //Toggle the checkbox when pressed on the item
         holder.itemLayout.setOnClickListener {
             holder.checkBox.isChecked = !holder.checkBox.isChecked

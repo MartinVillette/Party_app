@@ -67,5 +67,4 @@ class NewEventDateFragment : Fragment() {
             fragmentManager.popBackStack()
         }
     }
-
 }

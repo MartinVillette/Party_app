@@ -7,17 +7,16 @@ class Event (
     var eventId: String? = null,
     var eventName: String? = null,
     var eventTimestamp: Long? = null,
-    var users: MutableList<User> = mutableListOf(),
+    var eventAddress: Address? = null,
+    var usersIds: ArrayList<String> = arrayListOf(),
     var messages: MutableList<Message> = mutableListOf(),
     //var itemList: MutableList<Item> = mutableListOf(),
     var itemList: HashMap<String, Item> = hashMapOf(),
     var usersColor: HashMap<String, Int> = hashMapOf(),
 ) {
     fun addUserToEvent(user: User){
-        val usersIds: List<String> = users.map { it.userId!! }
-
         if (!usersIds.contains(user.userId)){
-            users.add(user)
+            usersIds.add(user.userId!!)
 
             val random = Random(System.currentTimeMillis())
             val hue = random.nextInt(360).toFloat()
@@ -32,13 +31,19 @@ class Event (
     }
 
     fun removeUserFromEvent(userId: String){
-        val usersIds: List<String> = users.map { it.userId!! }
         if (usersIds.contains(userId)){
             var i = 0
-            while (users[i].userId != userId){
+            while (usersIds[i] != userId){
                 i++
             }
-            users.removeAt(i)
+            usersIds.removeAt(i)
         }
+    }
+    fun addItem(item:Item){
+        itemList[item.itemId!!] = item
+    }
+
+    fun removeItem(item:Item){
+        itemList.remove(item.itemId!!)
     }
 }

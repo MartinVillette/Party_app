@@ -1,6 +1,5 @@
 package com.martin.partyapp
 
-import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -55,8 +54,6 @@ class NewEventTimeFragment : Fragment() {
         val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
         val formattedDate = dateFormat.format(date)
 
-
-
         val eventDateText: TextView = view.findViewById(R.id.text_event_date)
         eventDateText.text = formattedDate
 
@@ -90,8 +87,8 @@ class NewEventTimeFragment : Fragment() {
             }
             val fragmentManager = requireActivity().supportFragmentManager
             val transaction = fragmentManager.beginTransaction()
-            val timeFragment = NewEventMembersFragment.newInstance(eventName!!, calendar.timeInMillis)
-            transaction.replace(R.id.fragment_container, timeFragment)
+            val addressFragment = NewEventAddressFragment.newInstance(eventName!!, calendar.timeInMillis)
+            transaction.replace(R.id.fragment_container, addressFragment)
             transaction.addToBackStack(null)
             transaction.commit()
         }
