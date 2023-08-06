@@ -8,6 +8,7 @@
     android:paddingTop="10dp">
 
     <ImageView
+        android:id="@+id/image_event"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:background="@drawable/circle_background"/>
@@ -15,41 +16,52 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:layout_marginLeft="20dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/text_event_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="bold"
                 android:layout_weight="1"
                 android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="15sp" />
 
             <TextView
-                android:id="@+id/text_event_date"
+                android:id="@+id/text_event_last_notification"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="date"
-                android:textSize="16sp"
-                android:textColor="@color/white"/>
+                android:text="last message"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/text_event_last_notification"
-            android:layout_width="200dp"
+        <RelativeLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="last message"
-            android:textColor="@color/grey"
-            android:textSize="12sp" />
+            android:paddingLeft="30dp"
+            android:layout_weight="1">
 
+            <RelativeLayout
+                android:id="@+id/notification_dot"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:background="@drawable/circle_background_colored"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/text_event_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="16sp"
+            android:textColor="@color/white"/>
     </LinearLayout>
 </LinearLayout>

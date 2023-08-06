@@ -15,6 +15,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -35,7 +36,7 @@ class EventItemAdapter(private val context: Context, private val itemList: Array
     override fun onBindViewHolder(holder: EventItemViewHolder, position: Int) {
         val item = itemList[position]
         holder.itemView.setOnLongClickListener {
-            showEditItemPopUp(item)
+            showEditItemPopup(item)
             true
         }
         holder.itemView.setOnClickListener {
@@ -48,6 +49,45 @@ class EventItemAdapter(private val context: Context, private val itemList: Array
     override fun getItemCount(): Int {
         return itemList.size
     }
+
+    private fun showEditItemPopup(item: Item){
+        val database:FirebaseDatabase = FirebaseDatabase.getInstance()
+
+        val dialogBuilder = AlertDialog.Builder(context)
+        val popupView = LayoutInflater.from(context).inflate(R.layout.edit_item_popup, null)
+
+        val itemNameInput: EditText = popupView.findViewById(R.id.edit_item_name)
+        itemNameInput.setText(item.itemName)
+        val itemQuantityInput: EditText = popupView.findViewById(R.id.edit_item_quantity)
+        itemQuantityInput.setText(item.itemQuantity.toString())
+        val editItemButton: Button = popupView.findViewById(R.id.button_edit_item)
+        val cancelButton: Button = popupView.findViewById(R.id.button_cancel)
+
+        dialogBuilder.setView(popupView)
+        val alertDialog = dialogBuilder.create()
+
+        editItemButton.setOnClickListener {
+            val itemName = itemNameInput.text.toString()
+            if (itemName.isNotEmpty()){
+                item.itemName = itemName
+                item.itemQuantity = itemQuantityInput.text.toString().toIntOrNull() ?: 1
+                val itemRef = database.getReference("Event/${event.eventId}/itemList/${item.itemId}")
+                itemRef.setValue(item)
+                    .addOnSuccessListener {
+                        notifyDataSetChanged()
+                        alertDialog.dismiss()
+                    }
+            } else {
+                Toast.makeText(context, "Enter an item name", Toast.LENGTH_SHORT)
+            }
+        }
+        cancelButton.setOnClickListener {
+            alertDialog.dismiss()
+        }
+        alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        alertDialog.show()
+    }
+    /*
     private fun showEditItemPopUp(item: Item){
         val database:FirebaseDatabase = FirebaseDatabase.getInstance()
 
@@ -85,6 +125,8 @@ class EventItemAdapter(private val context: Context, private val itemList: Array
         }
         builder.show()
     }
+
+     */
 
     inner class EventItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val itemName: TextView = itemView.findViewById(R.id.item_name)

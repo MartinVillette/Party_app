@@ -111,31 +111,4 @@ class SignUpProfilePictureFragment : Fragment() {
     private fun openGallery(){
         pickImageContract.launch("image/*")
     }
-
-    private var imagePickerActivityResult: ActivityResultLauncher<Intent> =
-        registerForActivityResult( ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result != null) {
-                val imageUri: Uri? = result.data?.data
-                if (imageUri != null){
-                    val userId = auth.currentUser?.uid!!
-                    val imageRef = storage.getReference("Image/profilePictures/${userId}.jpg")
-                    val uploadTask = imageRef.putFile(imageUri!!)
-
-                    uploadTask.addOnSuccessListener {
-                        imageRef.downloadUrl.addOnSuccessListener { uri ->
-                            val profilePictureUrl = uri.toString()
-                            val userRef = database.getReference("User/$userId")
-                            userRef.child("profilePictureUrl").setValue(profilePictureUrl)
-
-                            Glide.with(requireActivity())
-                                .load(it)
-                                .circleCrop()
-                                .into(imageProfile)
-                        }
-                    }.addOnFailureListener {
-
-                    }
-                }
-            }
-        }
 }

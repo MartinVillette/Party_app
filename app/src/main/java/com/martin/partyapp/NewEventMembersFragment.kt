@@ -22,6 +22,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import org.w3c.dom.Text
 import java.sql.Timestamp
@@ -156,7 +157,6 @@ class NewEventMembersFragment : Fragment() {
             }
         })
     }
-
     private fun saveNewEvent(event: Event) {
         event.eventName = eventName
         event.eventTimestamp = eventTimestamp

@@ -3,15 +3,15 @@ package com.martin.partyapp
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
-import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +23,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 class EventItemsFragment: Fragment() {
-
     private lateinit var eventId: String
     private lateinit var event: Event
     private lateinit var authUser: User
@@ -35,6 +34,7 @@ class EventItemsFragment: Fragment() {
 
     private lateinit var membersButton: LinearLayout
     private lateinit var descriptionButton: LinearLayout
+    private lateinit var expensesButton: LinearLayout
 
     private var itemList: ArrayList<Item> = ArrayList()
     private lateinit var adapter: EventItemAdapter
@@ -64,30 +64,35 @@ class EventItemsFragment: Fragment() {
             transaction.replace(R.id.fragment_container, EventDescriptionFragment())
             transaction.commit()
         }
+        expensesButton = view.findViewById(R.id.button_expenses)
+        expensesButton.setOnClickListener {
+            val fragmentManager = requireActivity().supportFragmentManager
+            val transaction = fragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment_container, EventExpensesFragment())
+            transaction.commit()
+        }
 
         addItemButton = view.findViewById(R.id.button_add_item)
         addItemButton.setOnClickListener {
             showAddItemPopup()
         }
 
-        val currentUserRef = database.getReference("User/${auth.currentUser?.uid!!}")
-        currentUserRef.addValueEventListener(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()){
-                    val currentUser = snapshot.getValue(User::class.java)
-                    itemList = ArrayList()
-                    adapter = EventItemAdapter(requireContext(), itemList, event, currentUser!!) { item ->
-                        showItemPopUp(item)
-                    }
-                    eventItemRecyclerView = view.findViewById(R.id.items_recycler_view)
-                    eventItemRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-                    eventItemRecyclerView.adapter = adapter
+        eventItemRecyclerView = view.findViewById(R.id.items_recycler_view)
+        eventItemRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        val eventRef = database.getReference("Event/$eventId")
+        eventRef.addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    event = snapshot.getValue(Event::class.java)!!
+                    itemList.clear()
                     for ((_,item) in event.itemList){
                         itemList.add(item)
                     }
-                    Log.e("E",itemList.toString())
-                    adapter.notifyDataSetChanged()
+                    adapter = EventItemAdapter(requireContext(), itemList, event, authUser) { item ->
+                        showItemPopUp(item)
+                    }
+                    eventItemRecyclerView.adapter = adapter
                 }
             }
             override fun onCancelled(error: DatabaseError) {}
@@ -98,64 +103,67 @@ class EventItemsFragment: Fragment() {
         super.onAttach(context)
         if (context is EventDescriptionActivity){
             eventId = context.eventId
-            event = context.event
             authUser = context.authUser
         }
     }
+
     private fun showItemPopUp(item: Item){
-        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        val bottomSheetDialog = BottomSheetDialog(requireContext(), R.style.CustomBottomSheetDialog)
         val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.event_item_popup_layout, null)
 
         val itemNameText = popupView.findViewById<TextView>(R.id.text_item_name)
         itemNameText.text = item.itemName!!
 
-        val itemInfoAdapter = EventItemInfoAdapter(requireContext(), item.itemUserQuantityList)
+        val userQuantityList = ArrayList<ItemUserQuantity>()
+        for (itemUserQuantity in item.itemUserQuantityList){
+            if (itemUserQuantity.quantity > 0){
+                userQuantityList.add(itemUserQuantity)
+            }
+        }
+        val itemInfoAdapter = EventItemInfoAdapter(requireContext(), userQuantityList)
 
         val eventItemInfoRecyclerView = popupView.findViewById<RecyclerView>(R.id.item_info_recycler_view)
         eventItemInfoRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         eventItemInfoRecyclerView.adapter = itemInfoAdapter
 
         bottomSheetDialog.setContentView(popupView)
+        bottomSheetDialog.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.setBackgroundResource(R.drawable.custom_bottom_sheet_dialog_background)
         bottomSheetDialog.show()
     }
+
     private fun showAddItemPopup(){
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Add new Item")
+        val dialogBuilder = AlertDialog.Builder(context)
+        val popupView = LayoutInflater.from(context).inflate(R.layout.add_item_popup, null)
 
-        val itemNameInput = EditText(requireContext())
-        itemNameInput.hint = "Item Name"
-        val itemQuantityInput = EditText(requireContext())
-        itemQuantityInput.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
-        itemQuantityInput.hint = "Item Quantity"
+        val itemNameInput: EditText = popupView.findViewById(R.id.edit_item_name)
+        val itemQuantityInput: EditText = popupView.findViewById(R.id.edit_item_quantity)
+        val addItemButton: Button = popupView.findViewById(R.id.button_add_item)
+        val cancelButton: Button = popupView.findViewById(R.id.button_cancel)
 
+        dialogBuilder.setView(popupView)
+        val alertDialog = dialogBuilder.create()
 
-        val layout = LinearLayout(requireContext())
-        layout.orientation = LinearLayout.VERTICAL
-        layout.addView(itemNameInput)
-        layout.addView(itemQuantityInput)
-        builder.setView(layout)
-
-        builder.setPositiveButton("Add") { _, _ ->
+        addItemButton.setOnClickListener {
             val itemName = itemNameInput.text.toString()
-            val itemQuantity = itemQuantityInput.text.toString().toIntOrNull()
-            if (itemName.isNotEmpty() && itemQuantity != null){
+            if (itemName.isNotEmpty()) {
                 val newItem = Item()
                 newItem.itemName = itemName
-                newItem.itemQuantity = itemQuantity
+                newItem.itemQuantity = itemQuantityInput.text.toString().toIntOrNull() ?: 1
                 val newItemRef = database.getReference("Event/$eventId/itemList").push()
                 newItem.itemId = newItemRef.key ?: ""
                 newItemRef.setValue(newItem)
                     .addOnSuccessListener {
-                        event.addItem(newItem)
-                        itemList.add(newItem)
-                        adapter.notifyItemChanged(itemList.size - 1)
+                        alertDialog.dismiss()
                     }
+            } else {
+                Toast.makeText(requireContext(), "Enter an item name", Toast.LENGTH_SHORT)
             }
         }
-        builder.setNegativeButton("Cancel") { dialog, _ ->
-            dialog.cancel()
+
+        cancelButton.setOnClickListener {
+            alertDialog.dismiss()
         }
-        builder.show()
-        itemNameInput.requestFocus()
+        alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        alertDialog.show()
     }
 }

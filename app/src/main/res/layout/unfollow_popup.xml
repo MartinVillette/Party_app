@@ -1,0 +1,53 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:background="@drawable/custom_popup_background">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp">
+
+        <ImageView
+            android:id="@+id/image_profile_picture"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/circle_background_lightdark"/>
+
+        <TextView
+            android:id="@+id/text_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Username"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/white"
+            android:textSize="17sp"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/button_unfollow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:text="Unfollow"
+        android:textAllCaps="false"
+        android:textColor="@color/red"
+        android:textSize="17sp"/>
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:text="Cancel"
+        android:textAllCaps="false"
+        android:textColor="@color/grey"
+        android:textSize="17sp"/>
+</LinearLayout>

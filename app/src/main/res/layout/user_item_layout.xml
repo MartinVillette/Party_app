@@ -25,6 +25,24 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"/>
 
+    <Button
+        android:id="@+id/button_user_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:background="@drawable/button_dark_background"
+        android:visibility="gone"
+        android:textColor="@color/white"/>
+
+    <Button
+        android:id="@+id/button_user_action_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:background="@null"
+        android:visibility="gone"
+        android:textColor="@color/white"/>
+    <!--
     <ImageButton
         android:id="@+id/button_user_action"
         android:layout_width="wrap_content"
@@ -38,5 +56,6 @@
         android:layout_height="wrap_content"
         android:background="@null"
         android:padding="10dp" />
+    -->
 
 </LinearLayout>

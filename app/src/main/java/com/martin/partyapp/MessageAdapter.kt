@@ -1,5 +1,6 @@
 package com.martin.partyapp
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.provider.Telephony.Mms.Sent
@@ -46,6 +47,21 @@ class MessageAdapter (val context: Context, private val messageList: ArrayList<M
             //received message
             val viewHolder = holder as ReceivedViewHolder
             viewHolder.bind(message, event)
+
+            if (position < messageList.size - 1){
+                val nextMessage = messageList[position + 1]
+                if (nextMessage.senderUser!!.userId == message.senderUser!!.userId){
+                    viewHolder.profilePictureImage.visibility = View.INVISIBLE
+                }
+            }
+
+            if (position > 0){
+                val previousMessage = messageList[position - 1]
+                if (previousMessage.senderUser!!.userId != message.senderUser!!.userId){
+                    viewHolder.usernameText.visibility = View.VISIBLE
+                }
+            }
+
         }
     }
 
@@ -79,11 +95,14 @@ class MessageAdapter (val context: Context, private val messageList: ArrayList<M
 
     class ReceivedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         private val textMessageReceived: TextView = itemView.findViewById(R.id.text_message_received)
-        private val profilePictureImage: ImageView = itemView.findViewById(R.id.image_profile_picture)
+        val profilePictureImage: ImageView = itemView.findViewById(R.id.image_profile_picture)
+        val usernameText: TextView = itemView.findViewById(R.id.text_username)
 
+        @SuppressLint("SetTextI18n")
         fun bind(message: Message, event: Event){
             textMessageReceived.text = message.content
             textMessageReceived.setTextColor(event.usersColor[message.senderUser!!.userId]!!)
+            usernameText.text = "@${message.senderUser!!.username}"
 
             Glide.with(itemView)
                 .load(message.senderUser!!.profilePictureUrl)

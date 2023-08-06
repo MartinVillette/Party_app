@@ -10,8 +10,10 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 
 class SignUpLogsFragment : Fragment() {
     private var userName: String? = null
@@ -144,19 +146,26 @@ class SignUpLogsFragment : Fragment() {
     }
 
     private fun addUserToData(username: String, email: String, userId: String){
-        val userRef = database.getReference("User/$userId")
-        userRef.setValue(User(userId,username,email))
-            .addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    val fragmentManager = requireActivity().supportFragmentManager
-                    val transaction = fragmentManager.beginTransaction()
-                    val fragment = SignUpProfilePictureFragment.newInstance(userName!!)
-                    transaction.replace(R.id.fragment_container, fragment)
-                    transaction.addToBackStack(null)
-                    transaction.commit()
-                } else {
-                    Toast.makeText(requireContext(), "Some error occurred", Toast.LENGTH_SHORT).show()
-                }
+
+        FirebaseApp.initializeApp(requireContext())
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful){
+                val userFCMToken = task.result
+                val userRef = FirebaseDatabase.getInstance().getReference("User/$userId")
+                userRef.setValue(User(userId,username,email, userFCMToken))
+                    .addOnCompleteListener(requireActivity()) { task ->
+                        if (task.isSuccessful) {
+                            val fragmentManager = requireActivity().supportFragmentManager
+                            val transaction = fragmentManager.beginTransaction()
+                            val fragment = SignUpProfilePictureFragment.newInstance(userName!!)
+                            transaction.replace(R.id.fragment_container, fragment)
+                            transaction.addToBackStack(null)
+                            transaction.commit()
+                        } else {
+                            Toast.makeText(requireContext(), "Some error occurred", Toast.LENGTH_SHORT).show()
+                        }
+                    }
             }
+        }
     }
 }

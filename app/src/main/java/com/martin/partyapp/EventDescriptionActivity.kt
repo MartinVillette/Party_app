@@ -21,11 +21,10 @@ class EventDescriptionActivity : AppCompatActivity() {
     private lateinit var fragmentManager: FragmentManager
     private lateinit var database: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
-    private lateinit var fragmentList: ArrayList<Fragment>
 
     lateinit var authUser: User
-    lateinit var event: Event
     lateinit var eventId: String
+    lateinit var event: Event
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +33,7 @@ class EventDescriptionActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance()
 
-        eventId = intent.getStringExtra("eventId")!!
+        eventId = intent.getStringExtra("eventId") ?: ""
 
         toolbarBack = findViewById(R.id.button_back_toolbar)
         toolbarBack.setOnClickListener {
@@ -45,19 +44,29 @@ class EventDescriptionActivity : AppCompatActivity() {
 
         eventNameText = findViewById(R.id.text_event_name)
 
-        val eventRef = database.getReference("Event/$eventId")
-        eventRef.addListenerForSingleValueEvent(object: ValueEventListener{
+        val authUserRef = database.getReference("User/${auth.currentUser?.uid}")
+        authUserRef.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()){
-                    event = snapshot.getValue(Event::class.java)!!
-                    eventNameText.text = event.eventName
+                    authUser = snapshot.getValue(User::class.java)!!
 
-                    val authUserRef = database.getReference("User/${auth.currentUser?.uid}")
-                    authUserRef.addListenerForSingleValueEvent(object: ValueEventListener{
+                    val eventRef = database.getReference("Event/$eventId")
+                    eventRef.addValueEventListener(object: ValueEventListener{
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            if (snapshot.exists()){
-                                authUser = snapshot.getValue(User::class.java)!!
+                            if (snapshot.exists()) {
+                                val event = snapshot.getValue(Event::class.java)!!
+                                eventNameText.text = event.eventName
+                            }
+                        }
+                        override fun onCancelled(error: DatabaseError) {}
+                    })
 
+                    /*
+                    val eventRef = database.getReference("Event/$eventId")
+                    eventRef.addValueEventListener(object: ValueEventListener{
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            if (snapshot.exists()) {
+                                event = snapshot.getValue(Event::class.java)!!
                                 fragmentManager = supportFragmentManager
                                 val transaction: FragmentTransaction = fragmentManager.beginTransaction()
                                 transaction.add(R.id.fragment_container, EventDescriptionFragment())
@@ -65,7 +74,12 @@ class EventDescriptionActivity : AppCompatActivity() {
                             }
                         }
                         override fun onCancelled(error: DatabaseError) {}
-                    })
+                    }) */
+
+                    fragmentManager = supportFragmentManager
+                    val transaction: FragmentTransaction = fragmentManager.beginTransaction()
+                    transaction.add(R.id.fragment_container, EventDescriptionFragment())
+                    transaction.commit()
                 }
             }
             override fun onCancelled(error: DatabaseError) {}

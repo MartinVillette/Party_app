@@ -76,19 +76,22 @@ class EventListActivity : AppCompatActivity() {
 
     private fun initiateEventList(){
         val userId = auth.currentUser?.uid
-        val userRef = database.getReference("User/$userId")
-        userRef.addValueEventListener(object: ValueEventListener{
+        val eventIdsRef = database.getReference("User/$userId/eventIds")
+        eventIdsRef.addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 val eventIds: ArrayList<String> = ArrayList()
 
-                val user = snapshot.getValue(User::class.java)
-                user?.let{
-                    eventIds.addAll(it.eventIds)
+                for (postSnapshot in snapshot.children){
+                    if (postSnapshot.exists()){
+                        postSnapshot.getValue(String::class.java)?.let{
+                            eventIds.add(it)
+                        }
+                    }
                 }
 
                 for (eventId in eventIds){
                     val eventRef = database.getReference("Event/$eventId")
-                    eventRef.addValueEventListener(object: ValueEventListener{
+                    eventRef.addListenerForSingleValueEvent(object: ValueEventListener{
                         override fun onDataChange(snapshot: DataSnapshot) {
                             if (snapshot.exists()){
                                 val event = snapshot.getValue(Event::class.java)
@@ -116,6 +119,16 @@ class EventListActivity : AppCompatActivity() {
                 eventList.add(event)
             }
         }
+
+        /*
+        eventList.sortWith(compareByDescending {
+            if (it.messages.size > 0){
+                it.messages.last().date
+            } else {
+                0
+            }
+        })
+         */
         adapter.notifyDataSetChanged()
     }
 }

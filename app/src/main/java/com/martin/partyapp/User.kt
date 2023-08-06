@@ -6,6 +6,7 @@ class User(
     var userId: String? = null,
     var username: String? = null,
     var email: String? = null,
+    val userFCMToken: String? = null,
     var profilePictureUrl: String? = null,
     var followers: MutableList<User> = mutableListOf(),
     var following: MutableList<User> = mutableListOf(),

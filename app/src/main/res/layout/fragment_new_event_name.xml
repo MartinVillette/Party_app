@@ -20,13 +20,15 @@
             <EditText
                 android:id="@+id/edit_event_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:textColorHint="@color/grey"
                 android:textColor="@color/white"
                 android:textSize="25dp"
                 android:background="@null"
                 android:textAlignment="center"
-                android:hint="Event Name" />
+                android:hint="Event Name"
+                android:inputType="text|textImeMultiLine"
+                android:maxLines="1"/>
         </LinearLayout>
 
         <LinearLayout

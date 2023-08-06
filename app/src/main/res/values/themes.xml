@@ -99,4 +99,12 @@
         <item name="android:textColor">@color/red</item>
         <item name="android:padding">5dp</item>
     </style>
+
+    <style name="CustomBottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@drawable/custom_popup_background</item>
+    </style>
 </resources>

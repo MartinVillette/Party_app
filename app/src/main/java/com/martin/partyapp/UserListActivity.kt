@@ -23,7 +23,7 @@ class UserListActivity : AppCompatActivity() {
 
     private lateinit var toolbarBack: ImageButton
     private lateinit var searchBar: EditText
-    private lateinit var userList: ArrayList<String>
+    private var userList: ArrayList<String> = ArrayList()
     private lateinit var userRecyclerView: RecyclerView
     private lateinit var adapter: UserAdapter
     private lateinit var auth: FirebaseAuth
@@ -42,13 +42,24 @@ class UserListActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        userList = ArrayList()
 
-        adapter = UserAdapter(this, userList)
+        val authUserRef = database.getReference("User/${auth.currentUser?.uid!!}")
+        authUserRef.addListenerForSingleValueEvent(object:ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()){
+                    val authUser = snapshot.getValue(User::class.java)
+                    authUser?.let{
+                        adapter = UserAdapter(this@UserListActivity, userList, it)
 
-        userRecyclerView = findViewById(R.id.user_recycler_view)
-        userRecyclerView.layoutManager = LinearLayoutManager(this)
-        userRecyclerView.adapter = adapter
+                        userRecyclerView = findViewById(R.id.user_recycler_view)
+                        userRecyclerView.layoutManager = LinearLayoutManager(this@UserListActivity)
+                        userRecyclerView.adapter = adapter
+                    }
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+
 
         searchBar = findViewById(R.id.edit_research)
         searchBar.addTextChangedListener(object : TextWatcher {

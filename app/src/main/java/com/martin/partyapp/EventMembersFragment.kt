@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -23,15 +24,16 @@ class EventMembersFragment : Fragment() {
     private lateinit var authUser: User
 
     private lateinit var database: FirebaseDatabase
-    private lateinit var userList: ArrayList<String>
+    private var userList: ArrayList<String> = ArrayList()
     private lateinit var userRecyclerView: RecyclerView
     private lateinit var adapter: UserAdapter
     private lateinit var auth: FirebaseAuth
 
     private lateinit var eventMembersNumberText: TextView
-
+    private lateinit var addMembersButton: Button
     private lateinit var descriptionButton: LinearLayout
     private lateinit var itemsButton: LinearLayout
+    private lateinit var expensesButton: LinearLayout
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_event_members, container, false)
@@ -43,14 +45,39 @@ class EventMembersFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance()
 
-        userList = ArrayList()
-
-        adapter = UserAdapter(requireContext(), userList)
+        adapter = UserAdapter(requireContext(), userList, authUser)
         userRecyclerView = view.findViewById(R.id.event_recycler_view)
         userRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         userRecyclerView.adapter = adapter
 
         eventMembersNumberText = view.findViewById(R.id.text_event_members_number)
+
+        val eventRef = database.getReference("Event/$eventId")
+        eventRef.addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    event = snapshot.getValue(Event::class.java)!!
+                    userList.clear()
+                    for (userId in event.usersIds){
+                        if (userId != auth.currentUser?.uid!!){
+                            userList.add(userId)
+                        }
+                    }
+                    eventMembersNumberText.text = event.usersIds.size.toString()
+                    adapter.notifyDataSetChanged()
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {}
+        })
+
+
+        addMembersButton = view.findViewById(R.id.button_add_members)
+        addMembersButton.setOnClickListener {
+            val fragmentManager = requireActivity().supportFragmentManager
+            val transaction = fragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment_container, EventAddMembersFragment())
+            transaction.commit()
+        }
 
         descriptionButton = view.findViewById(R.id.button_description)
         descriptionButton.setOnClickListener {
@@ -66,21 +93,19 @@ class EventMembersFragment : Fragment() {
             transaction.replace(R.id.fragment_container, EventItemsFragment())
             transaction.commit()
         }
-
-        for (userId in event.usersIds){
-            if (userId != auth.currentUser?.uid!!){
-                userList.add(userId)
-            }
+        expensesButton = view.findViewById(R.id.button_expenses)
+        expensesButton.setOnClickListener {
+            val fragmentManager = requireActivity().supportFragmentManager
+            val transaction = fragmentManager.beginTransaction()
+            transaction.replace(R.id.fragment_container, EventExpensesFragment())
+            transaction.commit()
         }
-        eventMembersNumberText.text = userList.size.toString()
-        adapter.notifyDataSetChanged()
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is EventDescriptionActivity){
             eventId = context.eventId
-            event = context.event
             authUser = context.authUser
         }
     }

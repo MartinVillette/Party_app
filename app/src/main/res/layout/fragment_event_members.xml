@@ -89,6 +89,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/button_expenses"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -109,7 +110,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:textColor="@color/white"
-                android:text="..."/>
+                android:text="Expenses"/>
 
         </LinearLayout>
         <LinearLayout
@@ -168,6 +169,13 @@
                 android:layout_marginLeft="30dp"
                 android:textSize="20sp"
                 android:text="8"/>
+
+            <Button
+                android:id='@+id/button_add_members'
+                android:layout_below="@id/event_recycler_view"
+                android:layout_width="wrap_content"
+                style="@style/headerButton"
+                android:text="New Event"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"

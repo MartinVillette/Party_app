@@ -37,6 +37,7 @@ class EventUserAdapter(private val context: Context, private val event: Event, p
         }
     }
 
+
     override fun getItemCount(): Int {
         return userList.size
     }

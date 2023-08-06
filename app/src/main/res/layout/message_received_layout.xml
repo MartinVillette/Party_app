@@ -2,30 +2,46 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingTop="5dp"
-    android:paddingBottom="5dp">
-
-    <ImageView
-        android:id="@+id/image_profile_picture"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/circle_background_lightdark"/>
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/text_message_received"
+        android:id="@+id/text_username"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:textSize="16sp"
-        android:background="@drawable/message_background"
-        android:paddingEnd="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingStart="20dp"
-        android:textColor="@color/red"
-        android:layout_marginRight="100dp"
-        android:layout_marginLeft="20dp"
-        android:text="saleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeut"/>
+        android:textColor="@color/grey"
+        android:textSize="12sp"
+        android:layout_marginStart="60dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
+
+        <ImageView
+            android:id="@+id/image_profile_picture"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/circle_background_lightdark"/>
+
+        <TextView
+            android:id="@+id/text_message_received"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textSize="16sp"
+            android:background="@drawable/message_background"
+            android:paddingEnd="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingStart="20dp"
+            android:textColor="@color/red"
+            android:layout_marginEnd="80dp"
+            android:layout_marginStart="20dp"
+            android:text="saleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeut"/>
+
+    </LinearLayout>
 
 </LinearLayout>

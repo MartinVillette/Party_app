@@ -33,12 +33,13 @@ class ContactListActivity : AppCompatActivity() {
     private lateinit var followingButton: LinearLayout
     private lateinit var requestButton: LinearLayout
     private lateinit var userNameText: TextView
-    private lateinit var userList: ArrayList<String>
+    private var userList: ArrayList<String> = ArrayList()
     private lateinit var adapter: UserAdapter
     private lateinit var userRecyclerView: RecyclerView
     private lateinit var buttonBackToolbar: ImageButton
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
+    private lateinit var authUser: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,11 +50,19 @@ class ContactListActivity : AppCompatActivity() {
 
         userNameText = findViewById(R.id.text_username)
         val authUserRef = database.getReference("User/${auth.currentUser?.uid!!}")
-        authUserRef.addListenerForSingleValueEvent(object: ValueEventListener{
+        authUserRef.addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()){
-                    val authUser = snapshot.getValue(User::class.java)
-                    userNameText.text = authUser!!.username
+                    authUser = snapshot.getValue(User::class.java)!!
+                    userNameText.text = authUser.username
+
+                    adapter = UserAdapter(this@ContactListActivity, userList, authUser)
+
+                    userRecyclerView = findViewById(R.id.user_recycler_view)
+                    userRecyclerView.layoutManager = LinearLayoutManager(this@ContactListActivity)
+                    userRecyclerView.adapter = adapter
+
+                    updateUserList("", userType)
                 }
             }
 
@@ -76,13 +85,6 @@ class ContactListActivity : AppCompatActivity() {
         followerButton = findViewById(R.id.button_follower)
         followingButton = findViewById(R.id.button_following)
         requestButton = findViewById(R.id.button_request)
-
-        userList = ArrayList()
-        adapter = UserAdapter(this, userList)
-
-        userRecyclerView = findViewById(R.id.user_recycler_view)
-        userRecyclerView.layoutManager = LinearLayoutManager(this)
-        userRecyclerView.adapter = adapter
 
         searchBar = findViewById(R.id.edit_research)
         searchBar.addTextChangedListener(object : TextWatcher {
@@ -117,15 +119,15 @@ class ContactListActivity : AppCompatActivity() {
             followingButton.getChildAt(0).setBackgroundResource(R.drawable.circle_background)
             requestButton.getChildAt(0).setBackgroundResource(R.drawable.circle_background_colored)
         }
-
-        updateUserList("", userType)
     }
 
     private fun updateUserList(research: String, userType: String){
+        userList.clear()
+        adapter.notifyDataSetChanged()
+
         val userRef = database.getReference("User/${auth.currentUser?.uid!!}/$userType")
         userRef.addValueEventListener(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                userList.clear()
                 for (postSnapshot in snapshot.children){
                     val currentUser = postSnapshot.getValue(User::class.java)
                     val username = currentUser!!.username!!.lowercase()

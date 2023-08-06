@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/layout_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp">
+
+        <LinearLayout
+            android:id="@+id/button_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:text="📝"
+                android:textSize="25dp"
+                android:background="@drawable/circle_background_lightdark"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/white"
+                android:text="Description"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/button_members"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:text="✋"
+                android:textSize="25dp"
+                android:background="@drawable/circle_background_lightdark"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/white"
+                android:text="Members"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/button_items"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:text="🛒"
+                android:textSize="25dp"
+                android:background="@drawable/circle_background_lightdark"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/white"
+                android:text="Items"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:text="💰"
+                android:textSize="25dp"
+                android:background="@drawable/circle_background_colored"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/white"
+                android:text="Expenses"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:text="📷"
+                android:textSize="25dp"
+                android:background="@drawable/circle_background_lightdark"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/white"
+                android:text="..."/>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/layout_menu"
+        android:orientation="vertical"
+        android:background="@drawable/header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/header"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <Button
+                android:id="@+id/button_expenses"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Expenses"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:background="@null"
+                android:layout_weight="1"
+                android:textColor="@color/grey"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="·"
+                android:textColor="@color/white"
+                android:textSize="20sp"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Balance"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:background="@null"
+                android:layout_weight="1"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/button_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Balance"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="40dp"
+                android:paddingRight="40dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:background="@drawable/dark_rounded_background">
+
+                <TextView
+                    android:id="@+id/text_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text=""/>
+
+                <TextView
+                    android:id="@+id/text_user_balance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/green"
+                    android:text=""/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:textColor="@color/white"
+                android:text="·"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/balances_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>
