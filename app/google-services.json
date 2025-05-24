@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "626433119360-3lkm1lmo2gddh4oqk4u29v9cft5pkjj0.apps.googleusercontent.com",
+          "client_id": "YOUR_API_KEY",
           "client_type": 3
         }
       ],
